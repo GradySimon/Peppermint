@@ -10,5 +10,6 @@
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
     <string name="no_data_topic">No data: Lorem ipsum dolor sit amet, consectetur adipisicing elit.</string>
+    <string name="no_data_name">Nostrus Datum</string>
 
 </resources>
