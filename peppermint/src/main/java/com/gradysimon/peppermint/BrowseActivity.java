@@ -5,18 +5,18 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import java.util.List;
 
 public class BrowseActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -51,7 +51,7 @@ public class BrowseActivity extends Activity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, BrowseFragment.newInstance(position + 1))
                 .commit();
     }
 
@@ -105,7 +105,9 @@ public class BrowseActivity extends Activity
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class BrowseFragment extends Fragment {
+        private TextView topicTextView;
+        private TextView topicAuthorNameTextView;
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -116,23 +118,27 @@ public class BrowseActivity extends Activity
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static BrowseFragment newInstance(int sectionNumber) {
+            BrowseFragment fragment = new BrowseFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
             return fragment;
         }
 
-        public PlaceholderFragment() {
+        public BrowseFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_browse, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
+            topicTextView = (TextView) rootView.findViewById(R.id.topic_text);
+            if (topicTextView == null) {
+                Log.w("TEST", "topicTextView is null.");
+            }
+            topicAuthorNameTextView = (TextView) rootView.findViewById(R.id.topic_author_name);
+            new UpdateTopicTask().execute();
             return rootView;
         }
 
@@ -141,6 +147,21 @@ public class BrowseActivity extends Activity
             super.onAttach(activity);
             ((BrowseActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+
+        private class UpdateTopicTask extends AsyncTask<Void, Void, Topic> {
+
+            @Override
+            protected Topic doInBackground(Void... voids) {
+                List<Topic> topicList = UpstreamDataManager.getTopicList();
+                Topic firstTopic = topicList.get(0);
+                return firstTopic;
+            }
+
+            protected  void onPostExecute(Topic result) {
+                topicTextView.setText(result.getText());
+                topicAuthorNameTextView.setText(result.getAuthor().getWholeName());
+            }
         }
     }
 
