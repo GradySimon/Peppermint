@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Let's Talk"
-                android:id="@+id/lets_talk_button"/>
+                android:id="@+id/topic_positive_button"/>
         </LinearLayout>
     </RelativeLayout>
     <LinearLayout
