@@ -21,12 +21,7 @@ public class UpstreamDataManager {
     }
 
     public static List<Topic> getTopicListFromUpstream() {
-        Log.i("Server Interaction", "Initiating GET against the topic list API using JSON.");
         List<Topic> topicList = JsonApiManager.getTopicList();
-        Log.i("Server Interaction", "GET against the topic list API using JSON complete");
-        if (topicList == null) {
-            Log.w("Server Interaction", "Got null topicList from JsonApiManager.");
-        }
         if (topicList.isEmpty()) {
             Log.w("Server Interaction", "Got no results from JSON API on getTopicList().");
         }
@@ -45,7 +40,7 @@ public class UpstreamDataManager {
 
     private void refreshTopicQueue() {
         topicQueue().clear();
-        topicQueue().addAll(getTopicListFromUpstream())
+        topicQueue().addAll(getTopicListFromUpstream());
     }
 
     public Topic getNextTopic() {
@@ -57,5 +52,13 @@ public class UpstreamDataManager {
 
     private UpstreamDataManager() {
 
+    }
+
+    public void indicateTopicPositive(Topic currentTopic) {
+        // TODO: call JSON API to indicate interest in this topic
+    }
+
+    public void indicateTopicNegative(Topic currentTopic) {
+        // TODO: call JSON API to indicate boredom with this topic
     }
 }

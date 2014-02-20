@@ -7,16 +7,14 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.List;
 
 public class BrowseActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -107,7 +105,12 @@ public class BrowseActivity extends Activity
      */
     public static class BrowseFragment extends Fragment {
         private TextView topicTextView;
+        private Button topicPositiveButton;
+        private Button topicNegativeButton;
         private TextView topicAuthorNameTextView;
+
+        private Topic currentTopic;
+
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -133,13 +136,45 @@ public class BrowseActivity extends Activity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_browse, container, false);
-            topicTextView = (TextView) rootView.findViewById(R.id.topic_text);
-            if (topicTextView == null) {
-                Log.w("TEST", "topicTextView is null.");
-            }
-            topicAuthorNameTextView = (TextView) rootView.findViewById(R.id.topic_author_name);
-            new UpdateTopicTask().execute();
+            initializeViews(rootView);
+            registerEventListeners();
+            new ShowNextTopicTask().execute();
             return rootView;
+        }
+
+        private void registerEventListeners() {
+            topicPositiveButton.setOnClickListener(new View.OnClickListener() {
+               public void onClick(View v) {
+                   topicPositiveButtonPressed();
+               }
+            });
+            topicNegativeButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    topicNegativeButtonPressed();
+                }
+            });
+        }
+
+        private void topicPositiveButtonPressed() {
+            UpstreamDataManager.getInstance().indicateTopicPositive(currentTopic);
+            launchConversation(currentTopic);
+            (new ShowNextTopicTask()).execute();
+        }
+
+        private void topicNegativeButtonPressed() {
+            UpstreamDataManager.getInstance().indicateTopicNegative(currentTopic);
+            (new ShowNextTopicTask()).execute();
+        }
+
+        private void launchConversation(Topic currentTopic) {
+
+        }
+
+        private void initializeViews(View rootView) {
+            topicTextView = (TextView) rootView.findViewById(R.id.topic_text);
+            topicAuthorNameTextView = (TextView) rootView.findViewById(R.id.topic_author_name);
+            topicPositiveButton = (Button) rootView.findViewById((R.id.topic_positive_button));
+            topicNegativeButton = (Button) rootView.findViewById(R.id.topic_negative_button);
         }
 
         @Override
@@ -149,16 +184,17 @@ public class BrowseActivity extends Activity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
 
-        private class UpdateTopicTask extends AsyncTask<Void, Void, Topic> {
+        private class ShowNextTopicTask extends AsyncTask<Void, Void, Topic> {
 
             @Override
             protected Topic doInBackground(Void... voids) {
-                List<Topic> topicList = UpstreamDataManager.getTopicList();
-                Topic firstTopic = topicList.get(0);
-                return firstTopic;
+                UpstreamDataManager dataManager = UpstreamDataManager.getInstance();
+                Topic topic = dataManager.getNextTopic();
+                return topic;
             }
 
             protected  void onPostExecute(Topic result) {
+                currentTopic = result;
                 topicTextView.setText(result.getText());
                 topicAuthorNameTextView.setText(result.getAuthor().getWholeName());
             }
