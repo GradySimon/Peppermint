@@ -16,7 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class BrowseActivity extends Activity
+public class TopicBrowseActivity extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     /**
@@ -32,7 +32,7 @@ public class BrowseActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_browse);
+        setContentView(R.layout.activity_topic_browse);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -135,7 +135,7 @@ public class BrowseActivity extends Activity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_browse, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_topic_browse, container, false);
             initializeViews(rootView);
             registerEventListeners();
             new ShowNextTopicTask().execute();
@@ -180,7 +180,7 @@ public class BrowseActivity extends Activity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((BrowseActivity) activity).onSectionAttached(
+            ((TopicBrowseActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
 

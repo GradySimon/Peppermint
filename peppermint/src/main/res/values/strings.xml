@@ -11,5 +11,7 @@
     <string name="action_settings">Settings</string>
     <string name="no_data_topic">No data: Lorem ipsum dolor sit amet, consectetur adipisicing elit.</string>
     <string name="no_data_name">Grady Simon</string>
+    <string name="title_activity_conversation_browse">ConversationBrowse</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
