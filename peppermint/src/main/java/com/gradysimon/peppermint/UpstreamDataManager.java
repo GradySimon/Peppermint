@@ -61,4 +61,9 @@ public class UpstreamDataManager {
     public void indicateTopicNegative(Topic currentTopic) {
         // TODO: call JSON API to indicate boredom with this topic
     }
+
+    public List<Conversation> getConversationList() {
+        // TODO: Implement this for real. Don't use fake conversations.
+        return DataFaker.getFakeConversationList();
+    }
 }

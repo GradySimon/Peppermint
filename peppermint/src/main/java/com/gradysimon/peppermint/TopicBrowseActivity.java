@@ -195,8 +195,13 @@ public class TopicBrowseActivity extends Activity
 
             protected  void onPostExecute(Topic result) {
                 currentTopic = result;
-                topicTextView.setText(result.getText());
-                topicAuthorNameTextView.setText(result.getAuthor().getWholeName());
+                if (currentTopic == null) {
+                    topicTextView.setText(getResources().getText(R.string.no_data_topic));
+                    topicAuthorNameTextView.setText(getResources().getText(R.string.no_data_name));
+                } else {
+                    topicTextView.setText(result.getText());
+                    topicAuthorNameTextView.setText(result.getAuthor().getWholeName());
+                }
             }
         }
     }

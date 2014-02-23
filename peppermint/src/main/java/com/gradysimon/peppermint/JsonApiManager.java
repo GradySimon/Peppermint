@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +39,12 @@ public class JsonApiManager {
         gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
         Type topicListType = new TypeToken<List<Topic>>(){}.getType();
         Gson gson = gsonBuilder.create();
-        return gson.fromJson(jsonString, topicListType);
+        List<Topic> topicList = gson.fromJson(jsonString, topicListType);
+        if (topicList == null) {
+            return new ArrayList<Topic>();
+        } else {
+            return topicList;
+        }
     }
 
     private static String apiGet(String apiEndpoint, String apiSuffix) throws MalformedURLException {

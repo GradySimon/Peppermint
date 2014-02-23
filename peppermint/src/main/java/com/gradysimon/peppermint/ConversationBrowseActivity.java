@@ -3,15 +3,27 @@ package com.gradysimon.peppermint;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 public class ConversationBrowseActivity extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_conversation_browse);
+        //setContentView(R.layout.activity_conversation_browse);
+        Log.d("Test", "Upstream delivered " + UpstreamDataManager.getInstance().getConversationList().size());
+        ListAdapter conversationAdapter = new ConversationListAdapter(
+                this,
+                R.layout.conversation_list_item,
+                UpstreamDataManager.getInstance().getConversationList()
+        );
+        setListAdapter(conversationAdapter);
     }
 
     @Override
@@ -34,4 +46,9 @@ public class ConversationBrowseActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Conversation conversation = ((ConversationListAdapter) getListAdapter()).getItem(position);
+        //Utils.launchConversationActivity(conversation);
+    }
 }
