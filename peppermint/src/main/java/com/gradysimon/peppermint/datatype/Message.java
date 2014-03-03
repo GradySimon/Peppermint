@@ -1,4 +1,4 @@
-package com.gradysimon.peppermint;
+package com.gradysimon.peppermint.datatype;
 
 /**
  * Created by grady on 2/22/14.

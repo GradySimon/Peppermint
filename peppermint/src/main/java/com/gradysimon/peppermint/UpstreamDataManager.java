@@ -2,6 +2,10 @@ package com.gradysimon.peppermint;
 
 import android.util.Log;
 
+import com.gradysimon.peppermint.datatype.Conversation;
+import com.gradysimon.peppermint.datatype.Topic;
+import com.gradysimon.peppermint.sync.JsonApiManager;
+
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;

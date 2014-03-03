@@ -1,4 +1,8 @@
-package com.gradysimon.peppermint;
+package com.gradysimon.peppermint.datatype;
+
+import com.gradysimon.peppermint.datatype.Message;
+import com.gradysimon.peppermint.datatype.Topic;
+import com.gradysimon.peppermint.datatype.UserProfile;
 
 import java.util.ArrayList;
 import java.util.List;

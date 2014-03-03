@@ -1,5 +1,8 @@
 package com.gradysimon.peppermint;
 
+import com.gradysimon.peppermint.datatype.Conversation;
+import com.gradysimon.peppermint.datatype.Message;
+
 /**
  * Created by grady on 2/22/14.
  */

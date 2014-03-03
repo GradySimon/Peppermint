@@ -1,5 +1,10 @@
 package com.gradysimon.peppermint;
 
+import com.gradysimon.peppermint.datatype.Conversation;
+import com.gradysimon.peppermint.datatype.Message;
+import com.gradysimon.peppermint.datatype.Topic;
+import com.gradysimon.peppermint.datatype.UserProfile;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -72,7 +77,8 @@ public class DataFaker {
         int id = random.nextInt();
         UserProfile author = getFakeUserProfile();
         String text = getRandomSentence();
-        return new Topic(id, author, text);
+        return null;
+        // return new Topic(id, author, text);
     }
 
     public static Message getFakeMessage(Conversation conversation) {

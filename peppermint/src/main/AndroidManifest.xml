@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
@@ -11,22 +14,39 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.gradysimon.peppermint.TopicBrowseActivity"
-            android:label="TopicBrowseActivity" >
+            android:name=".MainActivity"
+            android:label="MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="com.gradysimon.peppermint.TopicBrowseActivity" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.gradysimon.peppermint.ConversationBrowseActivity"
-            android:label="@string/title_activity_conversation_browse"
-            android:parentActivityName=".TopicBrowseActivity" >
+
+        <provider
+            android:name=".sync.UpstreamContentProvider"
+            android:authorities="com.gradysimon.peppermint.upstream"
+            android:exported="false" >
+        </provider>
+
+        <service
+            android:name=".sync.UpstreamSyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                       android:resource="@xml/upstream_sync_adapter" />
+        </service>
+
+        <service
+            android:name=".sync.UpstreamAuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="BrowseActivity" />
-        </activity>
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/upstream_authenticator" />
+        </service>
     </application>
 
 </manifest>
