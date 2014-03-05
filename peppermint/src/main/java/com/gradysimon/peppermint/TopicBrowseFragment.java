@@ -20,7 +20,7 @@ import com.gradysimon.peppermint.sync.SyncUtils;
 import com.gradysimon.peppermint.sync.UpstreamAuthenticatorService;
 import com.gradysimon.peppermint.sync.UpstreamContentProvider;
 
-public class TopicBrowseFragment extends Fragment {
+public class TopicBrowseFragment extends Fragment implements Navigable{
     private TextView topicTextView;
     private Button topicPositiveButton;
     private Button topicNegativeButton;
@@ -28,7 +28,9 @@ public class TopicBrowseFragment extends Fragment {
 
     private Topic currentTopic;
 
-    public final String TITLE = this.getResources().getString(R.string.topic_browse_fragment_title);
+    private Account account;
+
+    private String title;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -47,24 +49,10 @@ public class TopicBrowseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_conversation_browse, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_topic_browse, container, false);
         initializeViews(rootView);
         registerEventListeners();
         return rootView;
-    }
-
-    private static Account createSyncAccount(Context context) {
-        Account account = UpstreamAuthenticatorService.getAccount();
-        AccountManager accountManager = (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-        if (accountManager.addAccountExplicitly(account, null, null)) {
-            // Inform the system that this account supports sync
-            ContentResolver.setIsSyncable(account, UpstreamContentProvider.AUTHORITY, 1);
-            Log.i("Accounts", "Account successfully added.");
-            return account;
-        } else {
-            Log.e("Accounts", "Failed to add account.");
-            return null;
-        }
     }
 
     private void requestSync() {
@@ -109,8 +97,14 @@ public class TopicBrowseFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((MainActivity) activity).onSectionAttached(TITLE);
-        SyncUtils.createSyncAccount(activity);
+        title = getString(getNavigationTitleStringId());
+        ((MainActivity) activity).onSectionAttached(title);
+        account = SyncUtils.createSyncAccount(activity);
+    }
+
+    @Override
+    public int getNavigationTitleStringId() {
+        return R.string.topic_browse_fragment_title;
     }
 
     private class ShowNextTopicTask extends AsyncTask<Void, Void, Topic> {

@@ -17,9 +17,9 @@ import com.gradysimon.peppermint.sync.SyncUtils;
 
 import java.util.List;
 
-public class ConversationBrowseFragment extends ListFragment {
+public class ConversationBrowseFragment extends ListFragment implements Navigable {
 
-    public final String TITLE = this.getResources().getString(R.string.conversation_browse_fragment_title);
+    private String title;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -29,7 +29,6 @@ public class ConversationBrowseFragment extends ListFragment {
         ConversationBrowseFragment fragment = new ConversationBrowseFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
-        //fragment.setListAdapter(new ConversationListAdapter());
         return fragment;
     }
 
@@ -46,9 +45,21 @@ public class ConversationBrowseFragment extends ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((MainActivity) activity).onSectionAttached(TITLE);
+        title = this.getResources().getString(getNavigationTitleStringId());
+        ((MainActivity) activity).onSectionAttached(title);
         SyncUtils.createSyncAccount(activity);
+        setListAdapter(new ConversationListAdapter(
+                this.getActivity(),
+                R.layout.conversation_list_item,
+                
+                ));
     }
+
+    @Override
+    public int getNavigationTitleStringId() {
+        return R.string.conversation_browse_fragment_title;
+    }
+
     // TODO: Observers and other dynamic update stuff.
     public static class ConversationListAdapter extends ArrayAdapter<Conversation> {
 
@@ -64,12 +75,11 @@ public class ConversationBrowseFragment extends ListFragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Conversation conversation = conversations.get(position);
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
             // TODO: Use the convertView to recycle rows
             View conversationRow = (LinearLayout) inflater.inflate(R.layout.conversation_list_item, parent, false);
             // TODO: Update avatar too
             ((TextView) conversationRow.findViewById(R.id.topic_preview)).setText(conversation.getTopic().getText());
-            Log.d("Test", "Returned one.");
             return conversationRow;
         }
 

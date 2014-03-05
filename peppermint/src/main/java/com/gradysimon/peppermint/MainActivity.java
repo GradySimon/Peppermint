@@ -23,8 +23,9 @@ public class MainActivity extends Activity
      */
     private CharSequence mTitle;
 
-    private Fragment[] navigationDrawOptions = new Fragment[] {
-            TopicBrowseFragment.newInstance()
+    public static final Navigable[] navigationDrawOptions = new Navigable[] {
+            TopicBrowseFragment.newInstance(),
+            ConversationBrowseFragment.newInstance(),
     };
 
     @Override
@@ -47,7 +48,7 @@ public class MainActivity extends Activity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, TopicBrowseFragment.newInstance())
+                .replace(R.id.container, (Fragment) navigationDrawOptions[position])
                 .commit();
     }
 

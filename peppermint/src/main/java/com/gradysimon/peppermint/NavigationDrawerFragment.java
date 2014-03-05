@@ -4,6 +4,7 @@ package com.gradysimon.peppermint;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,8 +21,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.gradysimon.peppermint.datatype.Conversation;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -97,15 +107,11 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+        mDrawerListView.setAdapter(new NavigationArrayAdapter(
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
-                new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
-                }));
+                Arrays.asList(MainActivity.navigationDrawOptions)));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
@@ -278,5 +284,36 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+    }
+
+    private class NavigationArrayAdapter extends ArrayAdapter<Navigable> {
+        private Context context;
+        private int resource;
+        private int textViewResourceId;
+        private List<? extends Navigable> navigationItems;
+
+
+        public NavigationArrayAdapter(Context context, int resource, int textViewResourceId, List<? extends Navigable> navigationItems) {
+            super(context, resource, textViewResourceId, navigationItems.toArray(new Navigable[0]));
+            this.context = context;
+            this.resource = resource;
+            this.textViewResourceId = textViewResourceId;
+            this.navigationItems = navigationItems;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Navigable navigable = navigationItems.get(position);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+            // TODO: Use the convertView to recycle rows
+            View navigationItem = inflater.inflate(resource, parent, false);
+            String title = context.getString(navigable.getNavigationTitleStringId());
+            ((TextView) navigationItem.findViewById(textViewResourceId)).setText(title);
+            return navigationItem;
+        }
+
+        public int getViewTypeCount() {
+            return 1;
+        }
     }
 }
