@@ -1,8 +1,6 @@
 package com.gradysimon.peppermint.datatype;
 
-import com.gradysimon.peppermint.datatype.Message;
-import com.gradysimon.peppermint.datatype.Topic;
-import com.gradysimon.peppermint.datatype.UserProfile;
+import com.gradysimon.peppermint.sync.Synchronizable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +8,11 @@ import java.util.List;
 /**
  * Created by grady on 2/22/14.
  */
-public class Conversation {
-    private Topic topic;
-    private List<Message> messages;
-    private UserProfile counterParty;
+public class Conversation implements Synchronizable{
+    private int localId;
+    private int uuid;
+    private int topicUuid
+    private int counterPartyUuid;
 
 
     public Topic getTopic() {
