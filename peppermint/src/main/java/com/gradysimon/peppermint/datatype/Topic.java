@@ -23,6 +23,7 @@ public class Topic implements Synchronizable {
     private int uuid = Synchronizable.NEEDS_UPLOAD;
     private int authorUuid;
     private String text;
+    private boolean seen;
 
     public static Topic getByUuid(int uuid, Context context) {
         ContentResolver contentResolver = context.getContentResolver();
@@ -44,14 +45,24 @@ public class Topic implements Synchronizable {
         return topicList;
     }
 
+    public static List<Topic> getBestTopics(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri uri = UpstreamContract.Topic.UNSEEN_TOPICS_URI;
+        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        return listFromCursor(cursor);
+    }
+
     // ------------------------
 
-    public Topic(int uuid, int authorUuid, String text) {
+    // For UpstreamRepresentation.toTopic() and otherwise rebuilding an existing Topic
+    public Topic(int uuid, int authorUuid, String text, boolean seen) {
         this.uuid = uuid;
         this.authorUuid = authorUuid;
         this.text = text;
+        this.seen = seen;
     }
 
+    // For creating a new Topic
     public Topic(int authorUuid, String text) {
         this.authorUuid = authorUuid;
         this.text = text;
@@ -67,6 +78,7 @@ public class Topic implements Synchronizable {
         }
         this.authorUuid = cursor.getInt(UpstreamContract.Topic.AUTHOR_UUID_COL);
         this.text = cursor.getString(UpstreamContract.Topic.TEXT_COL);
+        this.seen = cursor.getInt(UpstreamContract.Topic.SEEN_COL) != 0;
     }
 
     public String getText() {
@@ -74,7 +86,7 @@ public class Topic implements Synchronizable {
     }
 
     public String toString() {
-        return "Topic ID: " + this.localId + " | Author ID: " + this.authorUuid + " | Text: " + this.text;
+        return "Topic - UUID: " + this.uuid + " | Author UUID: " + this.authorUuid + " | Text: " + this.text;
     }
 
     public int getLocalId() {
@@ -162,37 +174,34 @@ public class Topic implements Synchronizable {
         }
         contentValues.put(UpstreamContract.Topic.AUTHOR_UUID, this.authorUuid);
         contentValues.put(UpstreamContract.Topic.TEXT, this.text);
+        contentValues.put(UpstreamContract.Topic.SEEN, this.seen);
         return contentValues;
     }
 
     public UpstreamRepresentation toUpstreamRepresentation() {
-        return new UpstreamRepresentation(this.uuid, this.authorUuid, this.text);
+        return new UpstreamRepresentation(this.uuid, this.authorUuid, this.text, this.seen);
     }
 
     public class UpstreamRepresentation {
         private int id = Synchronizable.NEEDS_UPLOAD;
         private int authorId;
         private String text;
+        private boolean seen = false;
 
         public UpstreamRepresentation() {
             // no-args constructor for gson
         }
 
-        public UpstreamRepresentation(int uuid, int authorUuid, String text) {
+        public UpstreamRepresentation(int uuid, int authorUuid, String text, boolean seen) {
             this.id = uuid;
             this.authorId = authorUuid;
             this.text = text;
+            this.seen = seen;
         }
 
         public Topic toTopic() {
-            return new Topic(this.id, this.authorId, this.text);
+            return new Topic(this.id, this.authorId, this.text, this.seen);
         }
 
-        /**
-         * @return true if this UpstreamRepresentation came from upstream.
-         */
-        public boolean needsUpload() {
-            return id != Synchronizable.NEEDS_UPLOAD;
-        }
     }
 }

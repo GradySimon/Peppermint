@@ -20,21 +20,23 @@ public class UpstreamContentProvider extends ContentProvider {
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int USERPROFILE_UUID = 0;
     private static final int USERPROFILE_LOCAL_ID = 1;
-    private static final int USERPROFILE = 2;
-    private static final int TOPIC = 3;
-    private static final int TOPIC_LOCAL_ID = 4;
-    private static final int TOPIC_UUID = 5;
-    private static final int CONVERSATION= 6;
-    private static final int CONVERSATION_ID = 7;
+    private static final int USERPROFILES = 2;
+    private static final int TOPICS = 3;
+    private static final int UNSEEN_TOPICS = 4;
+    private static final int TOPIC_LOCAL_ID = 5;
+    private static final int TOPIC_UUID = 6;
+    private static final int CONVERSATIONS = 7;
+    private static final int CONVERSATION_ID = 8;
 
     static {
         uriMatcher.addURI(AUTHORITY, "userprofile/uuid/#", USERPROFILE_UUID);
         uriMatcher.addURI(AUTHORITY, "userprofile/localid/#", USERPROFILE_LOCAL_ID);
-        uriMatcher.addURI(AUTHORITY, "userprofile", USERPROFILE);
-        uriMatcher.addURI(AUTHORITY, "topic", TOPIC);
+        uriMatcher.addURI(AUTHORITY, "userprofile", USERPROFILES);
+        uriMatcher.addURI(AUTHORITY, "topic", TOPICS);
+        uriMatcher.addURI(AUTHORITY, "topic/unseen", UNSEEN_TOPICS);
         uriMatcher.addURI(AUTHORITY, "topic/localid/#", TOPIC_LOCAL_ID);
         uriMatcher.addURI(AUTHORITY, "topic/uuid/#", TOPIC_UUID);
-        uriMatcher.addURI(AUTHORITY, "conversation", CONVERSATION);
+        uriMatcher.addURI(AUTHORITY, "conversation", CONVERSATIONS);
         uriMatcher.addURI(AUTHORITY, "conversation/#", CONVERSATION_ID);
     }
 
@@ -56,7 +58,7 @@ public class UpstreamContentProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
         switch (uriMatcher.match(uri)) {
             // A single userprofile
-            case USERPROFILE:
+            case USERPROFILES:
                 selection = null;
                 projection = new String[]{
                         UpstreamContract.UserProfile.ID,
@@ -88,15 +90,27 @@ public class UpstreamContentProvider extends ContentProvider {
                 };
                 return readableDb().query(UpstreamContract.UserProfile.TABLE, projection, selection, selectionArgs, null, null, null);
             // All topics
-            case TOPIC:
+            case TOPICS:
                 selection = null;
                 projection = new String[]{
                         UpstreamContract.Topic.ID,
                         UpstreamContract.Topic.UUID,
                         UpstreamContract.Topic.AUTHOR_UUID,
                         UpstreamContract.Topic.TEXT,
+                        UpstreamContract.Topic.SEEN,
                 };
                 return readableDb().query(UpstreamContract.Topic.TABLE, projection, selection, null, null, null, null);
+            case UNSEEN_TOPICS:
+                selection = UpstreamContract.Topic.SEEN + " = ?";
+                selectionArgs = new String[]{"0"};
+                projection = new String[]{
+                        UpstreamContract.Topic.ID,
+                        UpstreamContract.Topic.UUID,
+                        UpstreamContract.Topic.AUTHOR_UUID,
+                        UpstreamContract.Topic.TEXT,
+                        UpstreamContract.Topic.SEEN,
+                };
+                return  readableDb().query(UpstreamContract.Topic.TABLE, projection, selection, selectionArgs, null, null, null);
             case TOPIC_LOCAL_ID:
                 requestedId = uri.getLastPathSegment();
                 selection = UpstreamContract.UserProfile.ID + " = ?";
@@ -106,6 +120,7 @@ public class UpstreamContentProvider extends ContentProvider {
                         UpstreamContract.Topic.UUID,
                         UpstreamContract.Topic.AUTHOR_UUID,
                         UpstreamContract.Topic.TEXT,
+                        UpstreamContract.Topic.SEEN,
                 };
                 return  readableDb().query(UpstreamContract.Topic.TABLE, projection, selection, selectionArgs, null, null, null);
             case TOPIC_UUID:
@@ -117,6 +132,7 @@ public class UpstreamContentProvider extends ContentProvider {
                         UpstreamContract.Topic.UUID,
                         UpstreamContract.Topic.AUTHOR_UUID,
                         UpstreamContract.Topic.TEXT,
+                        UpstreamContract.Topic.SEEN,
                 };
                 return  readableDb().query(UpstreamContract.Topic.TABLE, projection, selection, selectionArgs, null, null, null);
         }
@@ -139,10 +155,10 @@ public class UpstreamContentProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         switch (uriMatcher.match(uri)) {
-            case USERPROFILE:
+            case USERPROFILES:
                 long id = writableDb().insert(UpstreamContract.UserProfile.TABLE, null, values);
                 return ContentUris.appendId(uri.buildUpon(), id).build();
-            case TOPIC:
+            case TOPICS:
                 id = writableDb().insert(UpstreamContract.Topic.TABLE, null, values);
                 return ContentUris.appendId(uri.buildUpon(), id).build();
         }
@@ -200,7 +216,7 @@ public class UpstreamContentProvider extends ContentProvider {
                 UpstreamContract.Topic.TEXT + " text NOT NULL," +
                 UpstreamContract.Topic.LAST_MODIFIED + " timestamp with time zone, " +
                 UpstreamContract.Topic.INTERESTED + " integer, " +
-                UpstreamContract.Topic.SEEN + " integer" +
+                UpstreamContract.Topic.SEEN + " integer NOT NULL" +
                 ")" +
                 ";";
         public static final String SQL_CREATE_TABLE_CONVERSATION =

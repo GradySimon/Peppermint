@@ -60,6 +60,8 @@ public final class UpstreamContract {
         public static final String INTERESTED = "interested";
         public static final String SEEN = "seen";
 
+        public static final Uri UNSEEN_TOPICS_URI = CONTENT_URI.buildUpon().appendPath("unseen").build();
+
         public static Uri uuidUri(int uuid) {
             return CONTENT_URI.buildUpon().appendPath("uuid").appendPath(Integer.toString(uuid)).build();
         }
