@@ -115,9 +115,16 @@ public class Topic implements Synchronizable {
         return UpstreamContract.Topic.localIdUri(this.localId);
     }
 
+    public int getAuthorUuid() {
+        return authorUuid;
+    }
     @Override
     public void setUuid(int uuid) {
         this.uuid = uuid;
+    }
+
+    public void markAsSeen() {
+        seen = false;
     }
 
     @Override
@@ -140,17 +147,17 @@ public class Topic implements Synchronizable {
         Topic topic = (Topic) o;
 
         if (authorUuid != topic.authorUuid) return false;
-        if (localId != topic.localId) return false;
-        if (text != null ? !text.equals(topic.text) : topic.text != null) return false;
+        if (seen != topic.seen) return false;
+        if (!text.equals(topic.text)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = localId;
-        result = 31 * result + authorUuid;
-        result = 31 * result + (text != null ? text.hashCode() : 0);
+        int result = authorUuid;
+        result = 31 * result + text.hashCode();
+        result = 31 * result + (seen ? 1 : 0);
         return result;
     }
 

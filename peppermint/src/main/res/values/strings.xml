@@ -11,5 +11,12 @@
     <string name="no_data_name">Noah Datum</string>
     <string name="hello_world">Hello world!</string>
     <string name="conversation_browse_fragment_title">Browse Conversations</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="registration_prompt">Tell us about yourself</string>
+    <string name="registration_first_name_hint">First Name</string>
+    <string name="registration_last_name_hint">Last Name</string>
+    <string name="registration_submit">Submit</string>
+    <string name="registration_invalid">First name and last name, please.</string>
+    <string name="title_activity_conversation">ConversationActivity</string>
 
 </resources>

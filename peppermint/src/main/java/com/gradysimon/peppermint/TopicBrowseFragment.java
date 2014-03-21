@@ -15,10 +15,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.gradysimon.peppermint.datatype.Conversation;
 import com.gradysimon.peppermint.datatype.Topic;
 import com.gradysimon.peppermint.sync.SyncUtils;
 import com.gradysimon.peppermint.sync.UpstreamAuthenticatorService;
 import com.gradysimon.peppermint.sync.UpstreamContentProvider;
+
+import java.util.List;
 
 public class TopicBrowseFragment extends Fragment implements Navigable{
     private TextView topicTextView;
@@ -44,6 +47,7 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
     }
 
     public TopicBrowseFragment() {
+
     }
 
     @Override
@@ -76,15 +80,22 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
     }
 
     private void topicPositiveButtonPressed() {
-        (new ShowNextTopicTask()).execute();
+        currentTopic.markAsSeen();
+        currentTopic.save(getActivity());
+        launchConversation(currentTopic);
     }
 
     private void topicNegativeButtonPressed() {
-        requestSync();
+        currentTopic.markAsSeen();
+        currentTopic.save(getActivity());
+        (new ShowNextTopicTask()).execute();
     }
 
     private void launchConversation(Topic currentTopic) {
-
+        Conversation conversation = new Conversation(currentTopic);
+        conversation.save(getActivity());
+        (new ShowNextTopicTask()).execute();
+        Utils.launchConversationActivity(conversation.getLocalId(), getActivity());
     }
 
     private void initializeViews(View rootView) {
@@ -107,13 +118,12 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
         return R.string.topic_browse_fragment_title;
     }
 
-    private class ShowNextTopicTask extends AsyncTask<Void, Void, Topic> {
+    private class ShowNextTopicTask extends AsyncTask<Context, Void, Topic> {
 
         @Override
-        protected Topic doInBackground(Void... voids) {
-            Topic topic = new Topic(2, "Sunglasses are REALLY awesome.");
-            topic.save(getActivity());
-            return null;
+        protected Topic doInBackground(Context... contexts) {
+            List<Topic> topics = Topic.getBestTopics(contexts[0]);
+            return topics.get(0);
         }
 
         protected void onPostExecute(Topic result) {

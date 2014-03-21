@@ -48,11 +48,11 @@ public class ConversationBrowseFragment extends ListFragment implements Navigabl
         title = this.getResources().getString(getNavigationTitleStringId());
         ((MainActivity) activity).onSectionAttached(title);
         SyncUtils.createSyncAccount(activity);
-        setListAdapter(new ConversationListAdapter(
+        /*setListAdapter(new ConversationListAdapter(
                 this.getActivity(),
                 R.layout.conversation_list_item,
                 
-                ));
+                ));*/
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ConversationBrowseFragment extends ListFragment implements Navigabl
             // TODO: Use the convertView to recycle rows
             View conversationRow = (LinearLayout) inflater.inflate(R.layout.conversation_list_item, parent, false);
             // TODO: Update avatar too
-            ((TextView) conversationRow.findViewById(R.id.topic_preview)).setText(conversation.getTopic().getText());
+            ((TextView) conversationRow.findViewById(R.id.topic_preview)).setText(conversation.getTopic(context).getText());
             return conversationRow;
         }
 

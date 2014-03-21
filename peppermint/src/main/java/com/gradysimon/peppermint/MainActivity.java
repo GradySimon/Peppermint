@@ -31,16 +31,33 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ensureFirstStartActionsDone();
         setContentView(R.layout.activity_main);
-
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
-
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    private void ensureFirstStartActionsDone() {
+        ensureUserRegistered();
+    }
+
+    private void ensureUserRegistered() {
+        if (!userRegistered()) {
+            launchRegistrationActivity();
+        }
+    }
+
+    private void launchRegistrationActivity() {
+
+    }
+
+    // TODO: Move this to some global Application class?
+    private boolean userRegistered() {
     }
 
     @Override

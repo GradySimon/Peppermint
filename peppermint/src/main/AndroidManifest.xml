@@ -14,39 +14,46 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name="com.gradysimon.peppermint.MainActivity"
             android:label="MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <provider
-            android:name=".sync.UpstreamContentProvider"
+            android:name="com.gradysimon.peppermint.sync.UpstreamContentProvider"
             android:authorities="com.gradysimon.peppermint.upstream"
             android:exported="false" >
         </provider>
 
         <service
-            android:name=".sync.UpstreamSyncService"
-            android:exported="true">
+            android:name="com.gradysimon.peppermint.sync.UpstreamSyncService"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
-                       android:resource="@xml/upstream_sync_adapter" />
-        </service>
 
-        <service
-            android:name=".sync.UpstreamAuthenticatorService">
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/upstream_sync_adapter" />
+        </service>
+        <service android:name="com.gradysimon.peppermint.sync.UpstreamAuthenticatorService" >
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
+                <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
+
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/upstream_authenticator" />
         </service>
+
+        <activity
+            android:name="com.gradysimon.peppermint.ConversationActivity"
+            android:label="@string/title_activity_conversation" >
+        </activity>
     </application>
 
 </manifest>

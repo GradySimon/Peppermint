@@ -80,38 +80,4 @@ public class DataFaker {
         return null;
         // return new Topic(id, author, text);
     }
-
-    public static Message getFakeMessage(Conversation conversation) {
-        if (random.nextBoolean()) {
-            return new OutboundMessage(conversation, getRandomSentence());
-        } else {
-            return new InboundMessage(conversation, getRandomSentence());
-        }
-    }
-
-    public static List<Message> getFakeMessageList(Conversation conversation) {
-        List<Message> messageList = new ArrayList<>();
-        int length = random.nextInt(20) + 2;
-        for (int i = 0; i < length; i++) {
-            messageList.add(getFakeMessage(conversation));
-        }
-        return messageList;
-    }
-
-    public static Conversation getFakeConversation() {
-        UserProfile counterParty = getFakeUserProfile();
-        Topic topic = getFakeTopic();
-        Conversation conversation = new Conversation(topic, counterParty);
-        conversation.setMessages(getFakeMessageList(conversation));
-        return conversation;
-    }
-
-    public static List<Conversation> getFakeConversationList() {
-        List<Conversation> conversationList = new ArrayList<>();
-        int length = random.nextInt(10) + 2;
-        for (int i = 0; i < length; i++) {
-            conversationList.add(getFakeConversation());
-        }
-        return conversationList;
-    }
 }

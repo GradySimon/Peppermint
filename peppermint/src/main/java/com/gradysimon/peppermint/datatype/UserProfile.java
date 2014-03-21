@@ -89,20 +89,16 @@ public class UserProfile implements Synchronizable {
 
         UserProfile that = (UserProfile) o;
 
-        if (localId != that.localId) return false;
-        if (firstName != null ? !firstName.equals(that.firstName) : that.firstName != null)
-            return false;
-        if (lastName != null ? !lastName.equals(that.lastName) : that.lastName != null)
-            return false;
+        if (!firstName.equals(that.firstName)) return false;
+        if (!lastName.equals(that.lastName)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = localId;
-        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
-        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        int result = firstName.hashCode();
+        result = 31 * result + lastName.hashCode();
         return result;
     }
 
