@@ -38,7 +38,8 @@ public class RegisterActivity extends Activity {
         String firstName = firstNameEditText.getText().toString();
         String lastName = lastNameEditText.getText().toString();
         if (validateRegistration(firstName, lastName)) {
-            Utils.registerUserProfile(firstName, lastName, this);
+            GlobalApplication.getInstance().registerUserProfile(firstName, lastName);
+            finish();
         } else {
             clearInputs();
             Toast.makeText(this, R.string.registration_invalid, 2);

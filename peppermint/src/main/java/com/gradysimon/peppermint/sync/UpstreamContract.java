@@ -125,20 +125,20 @@ public final class UpstreamContract {
         public static final int ID_COL = 0;
         public static final int UUID_COL = 1;
         public static final int CONVERSATION_UUID_COL = 2;
-        public static final int SENDER_UUID_COL = 3;
+        public static final int FROM_COUNTERPARTY_COL = 3;
         public static final int CONTENT_COL = 4;
 
         public static final String ID = "_id";
         public static final String UUID = "uuid";
         public static final String CONVERSATION_UUID = "conversation_uuid";
-        public static final String SENDER_UUID = "sender_uuid";
+        public static final String FROM_COUNTERPARTY = "from_counterparty";
         public static final String CONTENT = "content";
 
         public static final String[] PROJECTION_ALL = {
                 ID,
                 UUID,
                 CONVERSATION_UUID,
-                SENDER_UUID,
+                FROM_COUNTERPARTY,
                 CONTENT
         };
 

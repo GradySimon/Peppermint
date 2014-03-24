@@ -6,7 +6,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.gradysimon.peppermint.Utils;
 import com.gradysimon.peppermint.sync.Synchronizable;
 import com.gradysimon.peppermint.sync.UpstreamContract;
 
@@ -20,7 +19,7 @@ public class Conversation implements Synchronizable{
     private int localId = Synchronizable.NOT_IN_DB;
     private int uuid = Synchronizable.NEEDS_UPLOAD;
     private int topicUuid;
-    private int counterPartyUuid;
+    private int counterpartyUuid;
 
     public static Conversation getByUuid(int uuid, Context context) {
         ContentResolver contentResolver = context.getContentResolver();
@@ -53,7 +52,7 @@ public class Conversation implements Synchronizable{
             this.uuid = upstreamIdFromDb;
         }
         this.topicUuid = cursor.getInt(UpstreamContract.Conversation.TOPIC_UUID_COL);
-        this.counterPartyUuid = cursor.getInt(UpstreamContract.Conversation.TOPIC_UUID_COL);
+        this.counterpartyUuid = cursor.getInt(UpstreamContract.Conversation.TOPIC_UUID_COL);
     }
 
     public Conversation() {
@@ -63,7 +62,13 @@ public class Conversation implements Synchronizable{
     // For launched conversations
     public Conversation(Topic topic) {
         this.topicUuid = topic.getUuid();
-        this.counterPartyUuid = topic.getAuthorUuid();
+        this.counterpartyUuid = topic.getAuthorUuid();
+    }
+
+    public Conversation(int uuid, int topicUuid, int counterpartyUuid) {
+        this.uuid = uuid;
+        this.topicUuid = topicUuid;
+        this.counterpartyUuid = counterpartyUuid;
     }
 
     public int getTopicUuid() {
@@ -75,8 +80,8 @@ public class Conversation implements Synchronizable{
     }
 
 
-    public int getCounterPartyUuid() {
-        return this.counterPartyUuid;
+    public int getCounterpartyUuid() {
+        return this.counterpartyUuid;
     }
 
     public void addMessage(Message message) {
@@ -107,7 +112,7 @@ public class Conversation implements Synchronizable{
             contentValues.put(UpstreamContract.Conversation.UUID, this.uuid);
         }
         contentValues.put(UpstreamContract.Conversation.TOPIC_UUID, this.topicUuid);
-        contentValues.put(UpstreamContract.Conversation.COUNTERPARTY_UUID, this.counterPartyUuid);
+        contentValues.put(UpstreamContract.Conversation.COUNTERPARTY_UUID, this.counterpartyUuid);
         return contentValues;
     }
 
@@ -158,7 +163,7 @@ public class Conversation implements Synchronizable{
 
         Conversation that = (Conversation) o;
 
-        if (counterPartyUuid != that.counterPartyUuid) return false;
+        if (counterpartyUuid != that.counterpartyUuid) return false;
         if (topicUuid != that.topicUuid) return false;
 
         return true;
@@ -167,11 +172,27 @@ public class Conversation implements Synchronizable{
     @Override
     public int hashCode() {
         int result = topicUuid;
-        result = 31 * result + counterPartyUuid;
+        result = 31 * result + counterpartyUuid;
         return result;
     }
 
     public class UpstreamRepresentation {
         private int id = Synchronizable.NEEDS_UPLOAD;
+        private int topicId;
+        private int counterpartyId;
+
+        public UpstreamRepresentation() {
+            // no args constructor for gson
+        }
+
+        public UpstreamRepresentation(int uuid, int topicUuid, int counterpartyUuid) {
+            this.id = uuid;
+            this.topicId = topicUuid;
+            this.counterpartyId = counterpartyUuid;
+        }
+
+        public Conversation toConversation() {
+            return new Conversation(id, topicId, counterpartyId);
+        }
     }
 }

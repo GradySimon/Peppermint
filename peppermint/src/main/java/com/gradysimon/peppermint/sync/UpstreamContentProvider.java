@@ -168,6 +168,9 @@ public class UpstreamContentProvider extends ContentProvider {
             case TOPICS:
                 id = writableDb().insert(UpstreamContract.Topic.TABLE, null, values);
                 return ContentUris.appendId(uri.buildUpon(), id).build();
+            case CONVERSATIONS:
+                id = writableDb().insert(UpstreamContract.Conversation.TABLE, null, values);
+                return ContentUris.appendId(uri.buildUpon(), id).build();
         }
         throw new UnsupportedOperationException("That type of insert is not implemented yet.");
     }
@@ -239,7 +242,7 @@ public class UpstreamContentProvider extends ContentProvider {
                 UpstreamContract.Message.ID + " integer PRIMARY KEY, " +
                 UpstreamContract.Message.UUID + " integer, " +
                 UpstreamContract.Message.CONVERSATION_UUID + " integer NOT NULL REFERENCES " + UpstreamContract.Conversation.TABLE + " (" + UpstreamContract.Conversation.UUID + "), " +
-                UpstreamContract.Message.SENDER_UUID + " integer NOT NULL REFERENCES " + UpstreamContract.UserProfile.TABLE + " (" + UpstreamContract.UserProfile.UUID + "), " +
+                UpstreamContract.Message.FROM_COUNTERPARTY + " integer NOT NULL, " +
                 UpstreamContract.Message.CONTENT + "text NOT NULL" +
                 ");";
 

@@ -18,8 +18,17 @@ import java.util.List;
 public class UserProfile implements Synchronizable {
 
     public static UserProfile getByUuid(int uuid, Context context) {
-        ContentResolver contentResolver = context.getContentResolver();
         Uri uri = UpstreamContract.UserProfile.uuidUri(uuid);
+        return getByUri(uri, context);
+    }
+
+    public static UserProfile getByLocalId(int localId, Context context) {
+        Uri uri = UpstreamContract.UserProfile.localIdUri(localId);
+        return getByUri(uri, context);
+    }
+
+    public static UserProfile getByUri(Uri uri, Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
         Cursor cursor = contentResolver.query(uri, null, null, null, null);
         UserProfile result = null;
         if (cursor != null && cursor.moveToFirst()) {
@@ -27,12 +36,12 @@ public class UserProfile implements Synchronizable {
         }
         cursor.close();
         return result;
-
     }
 
     private int localId = Synchronizable.NOT_IN_DB;
     private int uuid = Synchronizable.NEEDS_UPLOAD;
     private String firstName;
+
     private String lastName;
 
     public UserProfile(int uuid, String firstName, String lastName) {

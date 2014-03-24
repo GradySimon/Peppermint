@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
 /**
@@ -22,5 +23,12 @@ public class SyncUtils {
             Log.e("Accounts", "Failed to add account.");
             return null;
         }
+    }
+
+    public static void requestImmediateSync(Account account) {
+        Bundle syncSettings = new Bundle();
+        syncSettings.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        syncSettings.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        ContentResolver.requestSync(account, UpstreamContentProvider.AUTHORITY, syncSettings);
     }
 }

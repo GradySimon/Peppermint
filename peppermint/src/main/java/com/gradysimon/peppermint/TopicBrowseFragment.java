@@ -21,7 +21,10 @@ import com.gradysimon.peppermint.sync.SyncUtils;
 import com.gradysimon.peppermint.sync.UpstreamAuthenticatorService;
 import com.gradysimon.peppermint.sync.UpstreamContentProvider;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Queue;
 
 public class TopicBrowseFragment extends Fragment implements Navigable{
     private TextView topicTextView;
@@ -29,9 +32,8 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
     private Button topicNegativeButton;
     private TextView topicAuthorNameTextView;
 
+    private LinkedList<Topic> topicsQueue = new LinkedList<>();
     private Topic currentTopic;
-
-    private Account account;
 
     private String title;
 
@@ -59,13 +61,6 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
         return rootView;
     }
 
-    private void requestSync() {
-        Bundle syncSettings = new Bundle();
-        syncSettings.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        syncSettings.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        ContentResolver.requestSync(account, UpstreamContentProvider.AUTHORITY, syncSettings);
-    }
-
     private void registerEventListeners() {
         topicPositiveButton.setOnClickListener(new View.OnClickListener() {
            public void onClick(View v) {
@@ -80,21 +75,25 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
     }
 
     private void topicPositiveButtonPressed() {
-        currentTopic.markAsSeen();
-        currentTopic.save(getActivity());
-        launchConversation(currentTopic);
+        if (currentTopic != null) {
+            currentTopic.markAsSeen();
+            currentTopic.save(getActivity());
+            launchConversation(currentTopic);
+        }
+        showNextTopic();
     }
 
     private void topicNegativeButtonPressed() {
-        currentTopic.markAsSeen();
-        currentTopic.save(getActivity());
-        (new ShowNextTopicTask()).execute();
+        if (currentTopic != null) {
+            currentTopic.markAsSeen();
+            currentTopic.save(getActivity());
+        }
+        showNextTopic();
     }
 
     private void launchConversation(Topic currentTopic) {
         Conversation conversation = new Conversation(currentTopic);
         conversation.save(getActivity());
-        (new ShowNextTopicTask()).execute();
         Utils.launchConversationActivity(conversation.getLocalId(), getActivity());
     }
 
@@ -110,7 +109,11 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
         super.onAttach(activity);
         title = getString(getNavigationTitleStringId());
         ((MainActivity) activity).onSectionAttached(title);
-        account = SyncUtils.createSyncAccount(activity);
+        showNextTopic();
+    }
+
+    private void showNextTopic() {
+        (new ShowNextTopicTask()).execute(getActivity());
     }
 
     @Override
@@ -122,18 +125,24 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
 
         @Override
         protected Topic doInBackground(Context... contexts) {
-            List<Topic> topics = Topic.getBestTopics(contexts[0]);
-            return topics.get(0);
+            if (topicsQueue.peek() == null) {
+                topicsQueue.addAll(Topic.getBestTopics(contexts[0]));
+            }
+            try {
+                return topicsQueue.pop();
+            } catch (NoSuchElementException e) {
+                return null;
+            }
         }
 
-        protected void onPostExecute(Topic result) {
-            currentTopic = result;
+        protected void onPostExecute(Topic newTopic) {
+            currentTopic = newTopic;
             if (currentTopic == null) {
                 topicTextView.setText(getResources().getText(R.string.no_data_topic));
                 topicAuthorNameTextView.setText(getResources().getText(R.string.no_data_name));
             } else {
-                topicTextView.setText(result.getText());
-                topicAuthorNameTextView.setText(result.getAuthor(getActivity()).getWholeName());
+                topicTextView.setText(newTopic.getText());
+                topicAuthorNameTextView.setText(newTopic.getAuthor(getActivity()).getWholeName());
             }
         }
     }

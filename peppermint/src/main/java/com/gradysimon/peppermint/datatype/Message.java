@@ -19,7 +19,7 @@ public class Message implements Synchronizable {
     private int localId = Synchronizable.NOT_IN_DB;
     private int uuid = Synchronizable.NEEDS_UPLOAD;
     private int conversationUuid;
-    private int senderUuid;
+    private boolean fromCounterparty;
     private String content;
 
     public static Message getByUuid(int uuid, Context context) {
@@ -53,8 +53,15 @@ public class Message implements Synchronizable {
             this.uuid = upstreamIdFromDb;
         }
         this.conversationUuid = cursor.getInt(UpstreamContract.Message.CONVERSATION_UUID_COL);
-        this.senderUuid = cursor.getInt(UpstreamContract.Message.SENDER_UUID_COL);
+        this.fromCounterparty = cursor.getInt(UpstreamContract.Message.FROM_COUNTERPARTY_COL) == 1;
         this.content = cursor.getString(UpstreamContract.Message.CONTENT_COL);
+    }
+
+    public Message(int uuid, int conversationUuid, boolean fromCounterparty, String content) {
+        this.uuid = uuid;
+        this.conversationUuid = conversationUuid;
+        this.fromCounterparty = fromCounterparty;
+        this.content = content;
     }
 
     @Override
@@ -77,7 +84,7 @@ public class Message implements Synchronizable {
             contentValues.put(UpstreamContract.Message.UUID, this.uuid);
         }
         contentValues.put(UpstreamContract.Message.CONVERSATION_UUID, this.conversationUuid);
-        contentValues.put(UpstreamContract.Message.SENDER_UUID, this.senderUuid);
+        contentValues.put(UpstreamContract.Message.FROM_COUNTERPARTY, this.fromCounterparty);
         contentValues.put(UpstreamContract.Message.CONTENT, this.content);
         return contentValues;
     }
@@ -118,6 +125,7 @@ public class Message implements Synchronizable {
         return UpstreamContract.Message.localIdUri(this.localId);
     }
 
+    // equals() and hashCode() don't use localId or uuid because they might not be set when the methods are used.
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -126,7 +134,7 @@ public class Message implements Synchronizable {
         Message message = (Message) o;
 
         if (conversationUuid != message.conversationUuid) return false;
-        if (senderUuid != message.senderUuid) return false;
+        if (fromCounterparty != message.fromCounterparty) return false;
         if (!content.equals(message.content)) return false;
 
         return true;
@@ -135,12 +143,30 @@ public class Message implements Synchronizable {
     @Override
     public int hashCode() {
         int result = conversationUuid;
-        result = 31 * result + senderUuid;
+        result = 31 * result + (fromCounterparty ? 1 : 0);
         result = 31 * result + content.hashCode();
         return result;
     }
 
     public class UpstreamRepresentation {
         private int id = Synchronizable.NEEDS_UPLOAD;
+        private int conversationId;
+        private boolean fromCounterparty;
+        private String content;
+
+        public UpstreamRepresentation() {
+            // no args constructor for gson
+        }
+
+        public UpstreamRepresentation(int uuid, int conversationUuid, boolean fromCounterparty, String content) {
+            this.id = uuid;
+            this.conversationId = conversationUuid;
+            this.fromCounterparty = fromCounterparty;
+            this.content = content;
+        }
+
+        public Message toMessage() {
+            return new Message(id, conversationId, fromCounterparty, content);
+        }
     }
 }

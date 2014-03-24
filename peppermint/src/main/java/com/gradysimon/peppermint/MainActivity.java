@@ -32,6 +32,7 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ensureFirstStartActionsDone();
+        GlobalApplication.getInstance().requestImmediateSync();
         setContentView(R.layout.activity_main);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -47,17 +48,9 @@ public class MainActivity extends Activity
     }
 
     private void ensureUserRegistered() {
-        if (!userRegistered()) {
-            launchRegistrationActivity();
+        if (!GlobalApplication.getInstance().userRegistered()) {
+            Utils.launchRegistrationActivity(this);
         }
-    }
-
-    private void launchRegistrationActivity() {
-
-    }
-
-    // TODO: Move this to some global Application class?
-    private boolean userRegistered() {
     }
 
     @Override
@@ -79,7 +72,6 @@ public class MainActivity extends Activity
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -105,5 +97,4 @@ public class MainActivity extends Activity
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

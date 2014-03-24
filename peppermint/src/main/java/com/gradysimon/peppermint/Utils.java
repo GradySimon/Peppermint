@@ -27,21 +27,6 @@ public class Utils {
         return returnString;
     }
 
-    public static void registerUserProfile(String firstName, String lastName, Context context) {
-        UserProfile user = new UserProfile(firstName, lastName);
-        int userLocalId = storeUserProfileLocally(user, context);
-        registerUserProfileLocalId(userLocalId);
-    }
-
-    private static void registerUserProfileLocalId(int userLocalId) {
-        // TODO: Shared preferences
-    }
-
-    private static int storeUserProfileLocally(UserProfile user, Context context) {
-        user.save(context);
-        return user.getLocalId();
-    }
-
     public static UserProfile getAppUserProfile() {
         return null;
     }
@@ -49,6 +34,11 @@ public class Utils {
     public static void launchConversationActivity(int conversationId, Context context) {
         Intent intent = new Intent(context, ConversationActivity.class);
         intent.putExtra(CONVERSATION_ID, conversationId);
+        context.startActivity(intent);
+    }
+
+    public static void launchRegistrationActivity(Context context) {
+        Intent intent = new Intent(context, RegisterActivity.class);
         context.startActivity(intent);
     }
 }

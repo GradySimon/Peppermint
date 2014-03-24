@@ -12,7 +12,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name=".GlobalApplication">
         <activity
             android:name="com.gradysimon.peppermint.MainActivity"
             android:label="MainActivity" >
@@ -53,6 +54,11 @@
         <activity
             android:name="com.gradysimon.peppermint.ConversationActivity"
             android:label="@string/title_activity_conversation" >
+        </activity>
+
+        <activity
+            android:name="com.gradysimon.peppermint.RegisterActivity"
+            android:label="@string/title_activity_register" >
         </activity>
     </application>
 

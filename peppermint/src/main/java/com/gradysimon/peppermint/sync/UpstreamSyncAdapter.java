@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.gradysimon.peppermint.datatype.Conversation;
+import com.gradysimon.peppermint.datatype.Message;
 import com.gradysimon.peppermint.datatype.Topic;
 import com.gradysimon.peppermint.datatype.UserProfile;
 
@@ -42,9 +44,15 @@ public class UpstreamSyncAdapter extends AbstractThreadedSyncAdapter {
         List<Topic> localTopicList = getLocalTopics();
         List<UserProfile> remoteUserProfileList = JsonApiManager.getUserProfileList();
         List<UserProfile> localUserProfileList = getLocalUserProfiles();
+        List<Conversation> remoteConversationList = JsonApiManager.getConversationList();
+        List<Conversation> localConversationList = getLocalConversations();
+        List<Message> remoteMessageList = JsonApiManager.getMessageList();
+        List<Message> localMessageList = getLocalMessages();
         // TODO: delete old or seen Topics?
         synchronizeLocalObjects(remoteTopicList, localTopicList, provider);
         synchronizeLocalObjects(remoteUserProfileList, localUserProfileList, provider);
+        synchronizeLocalObjects(remoteConversationList, localConversationList, provider);
+        synchronizeLocalObjects(remoteMessageList, localMessageList, provider);
     }
 
     private void synchronizeLocalObjects(List<? extends Synchronizable> remoteObjects, List<? extends Synchronizable> localObjects, ContentProviderClient provider) {
@@ -86,6 +94,16 @@ public class UpstreamSyncAdapter extends AbstractThreadedSyncAdapter {
             if (uploadObject instanceof UserProfile) {
                 UserProfile response = JsonApiManager.postUserProfile((UserProfile) uploadObject);
                 uploadObject.setUuid(response.getUuid());
+                uploadObject.save(this.getContext());
+            }
+            if (uploadObject instanceof Conversation) {
+                Conversation response = JsonApiManager.postConversation((Conversation) uploadObject);
+                uploadObject.setUuid((response.getUuid()));
+                uploadObject.save(this.getContext());
+            }
+            if (uploadObject instanceof Message) {
+                Conversation response = JsonApiManager.postMessage((Message) uploadObject);
+                uploadObject.setUuid((response.getUuid()));
                 uploadObject.save(this.getContext());
             }
         }
