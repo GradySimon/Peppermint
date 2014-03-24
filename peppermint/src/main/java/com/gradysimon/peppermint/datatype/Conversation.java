@@ -176,6 +176,10 @@ public class Conversation implements Synchronizable{
         return result;
     }
 
+    public UpstreamRepresentation toUpstreamRepresentation() {
+        return new UpstreamRepresentation(this.uuid, this.topicUuid, this.counterpartyUuid);
+    }
+
     public class UpstreamRepresentation {
         private int id = Synchronizable.NEEDS_UPLOAD;
         private int topicId;

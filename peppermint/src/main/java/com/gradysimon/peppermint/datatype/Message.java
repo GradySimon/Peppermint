@@ -148,6 +148,10 @@ public class Message implements Synchronizable {
         return result;
     }
 
+    public UpstreamRepresentation toUpstreamRepresentation() {
+        return new UpstreamRepresentation(this.uuid, this.conversationUuid, this.fromCounterparty, this.content);
+    }
+
     public class UpstreamRepresentation {
         private int id = Synchronizable.NEEDS_UPLOAD;
         private int conversationId;

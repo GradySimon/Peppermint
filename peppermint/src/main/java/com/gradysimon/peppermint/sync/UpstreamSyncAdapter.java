@@ -102,7 +102,7 @@ public class UpstreamSyncAdapter extends AbstractThreadedSyncAdapter {
                 uploadObject.save(this.getContext());
             }
             if (uploadObject instanceof Message) {
-                Conversation response = JsonApiManager.postMessage((Message) uploadObject);
+                Message response = JsonApiManager.postMessage((Message) uploadObject);
                 uploadObject.setUuid((response.getUuid()));
                 uploadObject.save(this.getContext());
             }
@@ -155,5 +155,21 @@ public class UpstreamSyncAdapter extends AbstractThreadedSyncAdapter {
         List<UserProfile> userProfileList = UserProfile.listFromCursor(cursor);
         cursor.close();
         return userProfileList;
+    }
+
+    private List<Conversation> getLocalConversations() {
+        ContentResolver contentResolver = getContext().getContentResolver();
+        Cursor cursor = contentResolver.query(UpstreamContract.Conversation.CONTENT_URI, null, null, null, null);
+        List<Conversation> conversationList = Conversation.listFromCursor(cursor);
+        cursor.close();
+        return conversationList;
+    }
+
+    private List<Message> getLocalMessages() {
+        ContentResolver contentResolver = getContext().getContentResolver();
+        Cursor cursor = contentResolver.query(UpstreamContract.Message.CONTENT_URI, null, null, null, null);
+        List<Message> messageList = Message.listFromCursor(cursor);
+        cursor.close();
+        return messageList;
     }
 }

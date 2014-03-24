@@ -165,6 +165,13 @@ public class JsonApiManager {
         return conversations;
     }
 
+    private static Message parseMessage(String json) {
+        Gson gson = getGson();
+        Type messageType = new TypeToken<Message.UpstreamRepresentation>(){}.getType();
+        Message.UpstreamRepresentation upstreamRepresentation = gson.fromJson(json, messageType);
+        return upstreamRepresentation.toMessage();
+    }
+
     private static List<Message> parseMessageList(String json) {
         Gson gson = getGson();
         Type messageListType = new TypeToken<List<Message.UpstreamRepresentation>>(){}.getType();

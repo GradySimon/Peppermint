@@ -51,7 +51,6 @@ public class ConversationBrowseFragment extends ListFragment implements Navigabl
         /*setListAdapter(new ConversationListAdapter(
                 this.getActivity(),
                 R.layout.conversation_list_item,
-                
                 ));*/
     }
 
