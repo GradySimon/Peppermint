@@ -149,5 +149,9 @@ public final class UpstreamContract {
         public static Uri localIdUri(int localId) {
             return CONTENT_URI.buildUpon().appendPath("localid").appendPath(Integer.toString(localId)).build();
         }
+
+        public static Uri messagesFromConversationUri(int conversationId) {
+            return CONTENT_URI.buildUpon().appendPath("conversation").appendPath(Integer.toString(conversationId)).build();
+        }
     }
 }

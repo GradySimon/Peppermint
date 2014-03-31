@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.gradysimon.peppermint.GlobalApplication;
 import com.gradysimon.peppermint.sync.Synchronizable;
 import com.gradysimon.peppermint.sync.UpstreamContract;
 
@@ -50,6 +51,11 @@ public class Topic implements Synchronizable {
         Uri uri = UpstreamContract.Topic.UNSEEN_TOPICS_URI;
         Cursor cursor = contentResolver.query(uri, null, null, null, null);
         return listFromCursor(cursor);
+    }
+
+    public static Topic createNewTopic(String topicText) {
+        int localUserUuid = GlobalApplication.getInstance().getRegisteredUser().getUuid();
+        return new Topic(localUserUuid, topicText);
     }
 
     // ------------------------
@@ -163,10 +169,7 @@ public class Topic implements Synchronizable {
 
     @Override
     public boolean requiresUpdate(Synchronizable remoteObject) {
-        if (!(remoteObject instanceof Topic)) {
-            return false;
-        }
-        return this.equals(remoteObject);
+        return !this.equals(remoteObject);
     }
 
     public ContentValues toContentValues() {

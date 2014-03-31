@@ -9,11 +9,11 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <application
+        android:name="com.gradysimon.peppermint.GlobalApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".GlobalApplication">
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.gradysimon.peppermint.MainActivity"
             android:label="MainActivity" >
@@ -55,10 +55,17 @@
             android:name="com.gradysimon.peppermint.ConversationActivity"
             android:label="@string/title_activity_conversation" >
         </activity>
-
         <activity
             android:name="com.gradysimon.peppermint.RegisterActivity"
             android:label="@string/title_activity_register" >
+        </activity>
+        <activity
+            android:name="com.gradysimon.peppermint.InitialTopicsActivity"
+            android:label="@string/title_activity_initial_topics"
+            android:parentActivityName="com.gradysimon.peppermint.RegisterActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="RegisterActivity" />
         </activity>
     </application>
 

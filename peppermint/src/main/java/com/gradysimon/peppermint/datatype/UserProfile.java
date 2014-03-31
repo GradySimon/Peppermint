@@ -85,10 +85,7 @@ public class UserProfile implements Synchronizable {
 
     @Override
     public boolean requiresUpdate(Synchronizable remoteObject) {
-        if (!(remoteObject instanceof UserProfile)) {
-            return false;
-        }
-        return this.equals(remoteObject);
+        return !this.equals(remoteObject);
     }
 
     @Override

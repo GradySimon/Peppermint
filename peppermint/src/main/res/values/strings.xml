@@ -18,5 +18,14 @@
     <string name="registration_submit">Submit</string>
     <string name="registration_invalid">First name and last name, please.</string>
     <string name="title_activity_conversation">ConversationActivity</string>
+    <string name="no_conversations_message">No conversations yet. Start one by tapping \"Let\'s Talk\" when you see a topic you like.</string>
+    <string name="send_message">Send</string>
+    <string name="long_lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</string>
+    <string name="title_activity_initial_topics">InitialTopicsActivity</string>
+    <string name="topic_prompt">Add some topics</string>
+    <string name="topic_encouragement_1">What do you want to talk about?</string>
+    <string name="submit_topic_button_text">Submit Topic</string>
+    <string name="topic_done_button_text">Done</string>
+    <string name="topic_entry_hint">Keep it concise yet provocative.</string>
 
 </resources>

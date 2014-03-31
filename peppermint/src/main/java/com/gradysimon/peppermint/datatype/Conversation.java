@@ -24,6 +24,17 @@ public class Conversation implements Synchronizable{
     public static Conversation getByUuid(int uuid, Context context) {
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = UpstreamContract.Conversation.uuidUri(uuid);
+        return getByUri(uri, context);
+    }
+
+    public static Conversation getByLocalId(int localId, Context context) {
+            Uri uri = UpstreamContract.UserProfile.localIdUri(localId);
+            return getByUri(uri, context);
+
+    }
+
+    public static Conversation getByUri(Uri uri, Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
         Cursor cursor = contentResolver.query(uri, null, null, null, null);
         Conversation result = null;
         if (cursor != null && cursor.moveToFirst()) {
@@ -44,15 +55,15 @@ public class Conversation implements Synchronizable{
     // ------------------------------------------------
 
     public Conversation(Cursor cursor) {
-        this.localId = cursor.getInt(UpstreamContract.Message.ID_COL);
-        int upstreamIdFromDb = cursor.getInt(UpstreamContract.Message.UUID_COL);
-        if (upstreamIdFromDb == cursor.FIELD_TYPE_NULL) {
+        this.localId = cursor.getInt(UpstreamContract.Conversation.ID_COL);
+        int uuidFromDb = cursor.getInt(UpstreamContract.Conversation.UUID_COL);
+        if (uuidFromDb == cursor.FIELD_TYPE_NULL) {
             this.uuid = Synchronizable.NEEDS_UPLOAD;
         } else {
-            this.uuid = upstreamIdFromDb;
+            this.uuid = uuidFromDb;
         }
         this.topicUuid = cursor.getInt(UpstreamContract.Conversation.TOPIC_UUID_COL);
-        this.counterpartyUuid = cursor.getInt(UpstreamContract.Conversation.TOPIC_UUID_COL);
+        this.counterpartyUuid = cursor.getInt(UpstreamContract.Conversation.COUNTERPARTY_UUID_COL);
     }
 
     public Conversation() {
@@ -75,10 +86,20 @@ public class Conversation implements Synchronizable{
         return this.topicUuid;
     }
 
+
     public List<Message> getMessages() {
         throw new UnsupportedOperationException();
     }
 
+    public Cursor getMessageCursor(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri messageUri = getMessageUri();
+        return contentResolver.query(messageUri, null, null, null, null);
+    }
+
+    public Uri getMessageUri() {
+        return UpstreamContract.Message.messagesFromConversationUri(this.uuid);
+    }
 
     public int getCounterpartyUuid() {
         return this.counterpartyUuid;
@@ -90,14 +111,6 @@ public class Conversation implements Synchronizable{
 
     public int getLocalId() {
         return localId;
-    }
-
-    @Override
-    public boolean requiresUpdate(Synchronizable remoteObject) {
-        if (!(remoteObject instanceof Conversation)) {
-            return false;
-        }
-        return this.equals(remoteObject);
     }
 
     @Override
@@ -170,6 +183,11 @@ public class Conversation implements Synchronizable{
     }
 
     @Override
+    public boolean requiresUpdate(Synchronizable remoteObject) {
+        return !this.equals(remoteObject);
+    }
+
+    @Override
     public int hashCode() {
         int result = topicUuid;
         result = 31 * result + counterpartyUuid;
@@ -181,7 +199,7 @@ public class Conversation implements Synchronizable{
     }
 
     public class UpstreamRepresentation {
-        private int id = Synchronizable.NEEDS_UPLOAD;
+        private int conversationId = Synchronizable.NEEDS_UPLOAD;
         private int topicId;
         private int counterpartyId;
 
@@ -190,13 +208,13 @@ public class Conversation implements Synchronizable{
         }
 
         public UpstreamRepresentation(int uuid, int topicUuid, int counterpartyUuid) {
-            this.id = uuid;
+            this.conversationId = uuid;
             this.topicId = topicUuid;
             this.counterpartyId = counterpartyUuid;
         }
 
         public Conversation toConversation() {
-            return new Conversation(id, topicId, counterpartyId);
+            return new Conversation(conversationId, topicId, counterpartyId);
         }
     }
 }

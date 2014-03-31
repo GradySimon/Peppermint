@@ -20,12 +20,14 @@
         android:layout_marginTop="20dp"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
+        android:inputType="textPersonName"
         android:hint="@string/registration_first_name_hint"/>
     <EditText
         android:id="@+id/last_name_edittext"
         android:layout_below="@id/first_name_edittext"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
+        android:inputType="textPersonName"
         android:hint="@string/registration_last_name_hint"/>
     <Button
         android:id="@+id/submit_button"

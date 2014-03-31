@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import com.gradysimon.peppermint.sync.Synchronizable;
 import com.gradysimon.peppermint.sync.UpstreamContract;
@@ -42,6 +43,13 @@ public class Message implements Synchronizable {
         return messageList;
     }
 
+    public static Message newOutboundMessage(String text, Conversation conversation) {
+        if (conversation.getUuid() == Synchronizable.NEEDS_UPLOAD) {
+            Log.e("Message", "Returning a Message with an unuploaded Conversation uuid. Things are going to break.");
+        }
+        return new Message(conversation.getUuid(), false, text);
+    }
+
     // --------------------------------------------------
 
     public Message(Cursor cursor) {
@@ -64,12 +72,15 @@ public class Message implements Synchronizable {
         this.content = content;
     }
 
+    public Message(int conversationUuid, boolean fromCounterparty, String content) {
+        this.conversationUuid = conversationUuid;
+        this.fromCounterparty = fromCounterparty;
+        this.content = content;
+    }
+
     @Override
     public boolean requiresUpdate(Synchronizable remoteObject) {
-        if (!(remoteObject instanceof Message)) {
-            return false;
-        }
-        return this.equals(remoteObject);
+        return !this.equals(remoteObject);
     }
 
     @Override
@@ -107,6 +118,18 @@ public class Message implements Synchronizable {
     @Override
     public void setUuid(int uuid) {
         this.uuid = uuid;
+    }
+
+    public boolean isFromCounterparty() {
+        return fromCounterparty;
+    }
+
+    public boolean isToCounterparty() {
+        return !fromCounterparty;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     @Override
@@ -153,24 +176,24 @@ public class Message implements Synchronizable {
     }
 
     public class UpstreamRepresentation {
-        private int id = Synchronizable.NEEDS_UPLOAD;
+        private int messageId = Synchronizable.NEEDS_UPLOAD;
         private int conversationId;
         private boolean fromCounterparty;
-        private String content;
+        private String text;
 
         public UpstreamRepresentation() {
             // no args constructor for gson
         }
 
         public UpstreamRepresentation(int uuid, int conversationUuid, boolean fromCounterparty, String content) {
-            this.id = uuid;
+            this.messageId = uuid;
             this.conversationId = conversationUuid;
             this.fromCounterparty = fromCounterparty;
-            this.content = content;
+            this.text = content;
         }
 
         public Message toMessage() {
-            return new Message(id, conversationId, fromCounterparty, content);
+            return new Message(messageId, conversationId, fromCounterparty, text);
         }
     }
 }

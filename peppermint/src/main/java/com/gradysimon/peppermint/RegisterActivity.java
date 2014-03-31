@@ -1,6 +1,7 @@
 package com.gradysimon.peppermint;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,17 +39,25 @@ public class RegisterActivity extends Activity {
         String firstName = firstNameEditText.getText().toString();
         String lastName = lastNameEditText.getText().toString();
         if (validateRegistration(firstName, lastName)) {
-            GlobalApplication.getInstance().registerUserProfile(firstName, lastName);
+            GlobalApplication appInstance = GlobalApplication.getInstance();
+            appInstance.registerUserProfile(firstName, lastName);
+            appInstance.requestImmediateSync();
+            launchInitialTopicsActivity();
             finish();
         } else {
             clearInputs();
-            Toast.makeText(this, R.string.registration_invalid, 2);
+            Toast.makeText(this, R.string.registration_invalid, Toast.LENGTH_LONG).show();
         }
     }
 
+    private void launchInitialTopicsActivity() {
+        Intent intent = new Intent(this, InitialTopicsActivity.class);
+        startActivity(intent);
+    }
+
     private void clearInputs() {
-        firstNameEditText.clearComposingText();
-        lastNameEditText.clearComposingText();
+        firstNameEditText.setText("");
+        lastNameEditText.setText("");
     }
 
     private boolean validateRegistration(String firstName, String lastName) {

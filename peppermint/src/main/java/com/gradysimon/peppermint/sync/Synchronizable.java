@@ -8,7 +8,7 @@ import android.net.Uri;
  * Created by grady on 3/1/14.
  */
 public interface Synchronizable {
-    public final int NEEDS_UPLOAD = -2;
+    public final int NEEDS_UPLOAD = -3;
 
     public final int NOT_IN_DB = -1;
 

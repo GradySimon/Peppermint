@@ -2,12 +2,15 @@ package com.gradysimon.peppermint;
 
 import android.accounts.Account;
 import android.app.Application;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 
 import com.gradysimon.peppermint.datatype.UserProfile;
 import com.gradysimon.peppermint.sync.SyncUtils;
+import com.gradysimon.peppermint.sync.UpstreamContract;
 
 /**
  * Created by grady on 3/21/14.
@@ -15,7 +18,7 @@ import com.gradysimon.peppermint.sync.SyncUtils;
 public class GlobalApplication extends Application {
 
     public static final String PREFERENCES_REGISTERED_USER_LOCAL_ID = "registered_user_local_id";
-    public static final int LOCAL_USER_NOT_REGISTERED = -1;
+    public static final int LOCAL_USER_NOT_REGISTERED = -2;
 
     public static GlobalApplication instance;
 
@@ -53,7 +56,11 @@ public class GlobalApplication extends Application {
 
     public UserProfile getRegisteredUser() {
         int localId = getRegisteredUserLocalId();
-        return UserProfile.getByLocalId(localId, this);
+        if (localId == LOCAL_USER_NOT_REGISTERED) {
+            return null;
+        } else {
+            return UserProfile.getByLocalId(localId, this);
+        }
     }
 
     public void setAccount(Account account) {
@@ -62,6 +69,12 @@ public class GlobalApplication extends Application {
 
     public void requestImmediateSync() {
         SyncUtils.requestImmediateSync(account);
+    }
+
+    public Cursor getLocalConversations() {
+        ContentResolver contentResolver = this.getContentResolver();
+        Cursor cursor = contentResolver.query(UpstreamContract.Conversation.CONTENT_URI, null, null, null, null);
+        return cursor;
     }
 
     @Override

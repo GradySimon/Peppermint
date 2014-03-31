@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.gradysimon.peppermint.GlobalApplication;
 import com.gradysimon.peppermint.datatype.Conversation;
 import com.gradysimon.peppermint.datatype.Message;
 import com.gradysimon.peppermint.datatype.Topic;
@@ -44,15 +45,20 @@ public class UpstreamSyncAdapter extends AbstractThreadedSyncAdapter {
         List<Topic> localTopicList = getLocalTopics();
         List<UserProfile> remoteUserProfileList = JsonApiManager.getUserProfileList();
         List<UserProfile> localUserProfileList = getLocalUserProfiles();
-        List<Conversation> remoteConversationList = JsonApiManager.getConversationList();
-        List<Conversation> localConversationList = getLocalConversations();
-        List<Message> remoteMessageList = JsonApiManager.getMessageList();
-        List<Message> localMessageList = getLocalMessages();
         // TODO: delete old or seen Topics?
         synchronizeLocalObjects(remoteTopicList, localTopicList, provider);
         synchronizeLocalObjects(remoteUserProfileList, localUserProfileList, provider);
-        synchronizeLocalObjects(remoteConversationList, localConversationList, provider);
-        synchronizeLocalObjects(remoteMessageList, localMessageList, provider);
+        UserProfile localUser = GlobalApplication.getInstance().getRegisteredUser();
+        if (localUser != null && localUser.getUuid() != Synchronizable.NEEDS_UPLOAD) {
+            int localUserUuid = localUser.getUuid();
+            List<Conversation> remoteConversationList = JsonApiManager.getConversationList(localUserUuid);
+            List<Conversation> localConversationList = getLocalConversations();
+            List<Message> remoteMessageList = JsonApiManager.getMessageList(localUserUuid);
+            List<Message> localMessageList = getLocalMessages();
+            // Syncing conversations before messages might be important (since the server won't be able to build a new message correctly if the conversation doesn't exist yet).
+            synchronizeLocalObjects(remoteConversationList, localConversationList, provider);
+            synchronizeLocalObjects(remoteMessageList, localMessageList, provider);
+        }
     }
 
     private void synchronizeLocalObjects(List<? extends Synchronizable> remoteObjects, List<? extends Synchronizable> localObjects, ContentProviderClient provider) {
@@ -74,7 +80,7 @@ public class UpstreamSyncAdapter extends AbstractThreadedSyncAdapter {
             if (correspondingLocalObject == null) {
                 // If there is no local topic with the same ID
                 insertList.add(remoteObject);
-            } else if (!correspondingLocalObject.requiresUpdate(remoteObject)){
+            } else if (correspondingLocalObject.requiresUpdate(remoteObject)){
                 // If there is a local topic with the same ID, but it differs from the remote
                 updateList.add(remoteObject);
                 // TODO: What if it's changed locally and we want to upload those changes?
@@ -97,14 +103,20 @@ public class UpstreamSyncAdapter extends AbstractThreadedSyncAdapter {
                 uploadObject.save(this.getContext());
             }
             if (uploadObject instanceof Conversation) {
-                Conversation response = JsonApiManager.postConversation((Conversation) uploadObject);
-                uploadObject.setUuid((response.getUuid()));
-                uploadObject.save(this.getContext());
+                UserProfile localUser = GlobalApplication.getInstance().getRegisteredUser();
+                if (localUser != null && localUser.getUuid() != Synchronizable.NEEDS_UPLOAD) {
+                    Conversation response = JsonApiManager.postConversation((Conversation) uploadObject, localUser.getUuid());
+                    uploadObject.setUuid((response.getUuid()));
+                    uploadObject.save(this.getContext());
+                }
             }
             if (uploadObject instanceof Message) {
-                Message response = JsonApiManager.postMessage((Message) uploadObject);
-                uploadObject.setUuid((response.getUuid()));
-                uploadObject.save(this.getContext());
+                UserProfile localUser = GlobalApplication.getInstance().getRegisteredUser();
+                if (localUser != null && localUser.getUuid() != Synchronizable.NEEDS_UPLOAD) {
+                    Message response = JsonApiManager.postMessage((Message) uploadObject, localUser.getUuid());
+                    uploadObject.setUuid((response.getUuid()));
+                    uploadObject.save(this.getContext());
+                }
             }
         }
     }

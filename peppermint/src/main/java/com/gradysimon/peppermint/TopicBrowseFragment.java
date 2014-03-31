@@ -88,6 +88,8 @@ public class TopicBrowseFragment extends Fragment implements Navigable{
             currentTopic.markAsSeen();
             currentTopic.save(getActivity());
         }
+        // TODO: Remove this next line
+        GlobalApplication.getInstance().requestImmediateSync();
         showNextTopic();
     }
 

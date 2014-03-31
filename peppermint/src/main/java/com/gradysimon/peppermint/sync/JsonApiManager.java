@@ -50,35 +50,27 @@ public class JsonApiManager {
     }
 
     public static List<Topic> getTopicList() {
-        String jsonString = apiGet(TOPIC_ENDPOINT, "");
+        String jsonString = apiGet(TOPIC_ENDPOINT);
         return parseTopicList(jsonString);
     }
 
-    public static Topic postTopic(Topic topic) {
-        Topic.UpstreamRepresentation upstreamRepresentation = topic.toUpstreamRepresentation();
-        Gson gson = getGson();
-        String topicJson = gson.toJson(upstreamRepresentation);
-        String responseJson = apiPost(TOPIC_ENDPOINT, topicJson);
-        return parseTopic(responseJson);
-    }
-
     public static List<UserProfile> getUserProfileList() {
-        String jsonString = apiGet(USER_PROFILE_ENDPOINT, "");
+        String jsonString = apiGet(USER_PROFILE_ENDPOINT);
         return parseUserProfileList(jsonString);
     }
 
     public static UserProfile getUserProfileDetail(int id) {
-        String jsonString = apiGet(USER_PROFILE_ENDPOINT, Integer.toString(id));
+        String jsonString = apiGet(USER_PROFILE_ENDPOINT + Integer.toString(id));
         return parseUserProfile(jsonString);
     }
 
-    public static List<Conversation> getConversationList() {
-        String jsonString = apiGet(CONVERSATION_ENDPOINT, "");
+    public static List<Conversation> getConversationList(int localUserUuid) {
+        String jsonString = apiGet(CONVERSATION_ENDPOINT + localUserUuid);
         return parseConversationList(jsonString);
     }
 
-    public static List<Message> getMessageList() {
-        String jsonString = apiGet(MESSAGE_ENDPOINT, "");
+    public static List<Message> getMessageList(int localUserUuid) {
+        String jsonString = apiGet(MESSAGE_ENDPOINT + localUserUuid);
         return parseMessageList(jsonString);
     }
 
@@ -95,19 +87,27 @@ public class JsonApiManager {
         return parseUserProfile(responseJson);
     }
 
-    public static Conversation postConversation(Conversation conversation) {
+    public static Topic postTopic(Topic topic) {
+        Topic.UpstreamRepresentation upstreamRepresentation = topic.toUpstreamRepresentation();
+        Gson gson = getGson();
+        String topicJson = gson.toJson(upstreamRepresentation);
+        String responseJson = apiPost(TOPIC_ENDPOINT, topicJson);
+        return parseTopic(responseJson);
+    }
+
+    public static Conversation postConversation(Conversation conversation, int uuid) {
         Conversation.UpstreamRepresentation upstreamRepresentation = conversation.toUpstreamRepresentation();
         Gson gson = getGson();
         String conversationJson = gson.toJson(upstreamRepresentation);
-        String responseJson = apiPost(CONVERSATION_ENDPOINT, conversationJson);
+        String responseJson = apiPost(CONVERSATION_ENDPOINT + uuid + "/", conversationJson);
         return parseConversation(responseJson);
     }
 
-    public static Message postMessage(Message message) {
+    public static Message postMessage(Message message, int uuid) {
         Message.UpstreamRepresentation upstreamRepresentation = message.toUpstreamRepresentation();
         Gson gson = getGson();
         String messageJson = gson.toJson(upstreamRepresentation);
-        String responseJson = apiPost(MESSAGE_ENDPOINT, messageJson);
+        String responseJson = apiPost(MESSAGE_ENDPOINT + uuid + "/", messageJson);
         return parseMessage(responseJson);
     }
 
@@ -183,14 +183,14 @@ public class JsonApiManager {
         return messages;
     }
 
-    private static String apiGet(String apiEndpoint, String apiSuffix) {
-        URL apiCallURL = buildUrl(apiEndpoint + apiSuffix);
+    private static String apiGet(String apiTarget) {
+        URL apiCallURL = buildUrl(apiTarget);
         HttpURLConnection apiConnection = getApiConnection(apiCallURL, "GET", false);
         return getResponse(apiConnection);
     }
 
-    private static String apiPost(String apiEndpoint, String json) {
-        URL apiCallURL = buildUrl(apiEndpoint);
+    private static String apiPost(String apiTarget, String json) {
+        URL apiCallURL = buildUrl(apiTarget);
         HttpURLConnection apiConnection = getApiConnection(apiCallURL, "POST", true);
         writeOverConnection(apiConnection, json);
         return getResponse(apiConnection);

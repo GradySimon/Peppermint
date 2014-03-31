@@ -143,7 +143,7 @@ public class UpstreamContentProvider extends ContentProvider {
                 projection = UpstreamContract.Message.PROJECTION_ALL;
                 return readableDb().query(UpstreamContract.Message.TABLE, projection, selection, selectionArgs, null, null, null);
         }
-        throw new UnsupportedOperationException("That type of query is not implemented yet.");
+        throw new UnsupportedOperationException("That type of query is not implemented yet (URI: " + uri.toString() + ")");
     }
 
     @Override
@@ -171,8 +171,11 @@ public class UpstreamContentProvider extends ContentProvider {
             case CONVERSATIONS:
                 id = writableDb().insert(UpstreamContract.Conversation.TABLE, null, values);
                 return ContentUris.appendId(uri.buildUpon(), id).build();
+            case MESSAGES:
+                id = writableDb().insert(UpstreamContract.Message.TABLE, null, values);
+                return ContentUris.appendId(uri.buildUpon(), id).build();
         }
-        throw new UnsupportedOperationException("That type of insert is not implemented yet.");
+        throw new UnsupportedOperationException("That type of insert is not implemented yet (URI: " + uri.toString() + ")");
     }
 
     @Override
@@ -201,8 +204,16 @@ public class UpstreamContentProvider extends ContentProvider {
                 selection = UpstreamContract.UserProfile.UUID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
                 return writableDb().update(UpstreamContract.UserProfile.TABLE, values, selection, selectionArgs);
+            case CONVERSATION_LOCAL_ID:
+                selection = UpstreamContract.Conversation.ID + " = ?";
+                selectionArgs = new String[]{uri.getLastPathSegment()};
+                return writableDb().update(UpstreamContract.Conversation.TABLE, values, selection, selectionArgs);
+            case MESSAGES_LOCAL_ID:
+                selection = UpstreamContract.Message.ID + " = ?";
+                selectionArgs = new String[]{uri.getLastPathSegment()};
+                return writableDb().update(UpstreamContract.Message.TABLE, values, selection, selectionArgs);
         }
-        throw new UnsupportedOperationException("That type of update is not implemented yet.");
+        throw new UnsupportedOperationException("That type of update is not implemented yet (URI: " + uri.toString() + ")");
     }
 
     /**
@@ -234,7 +245,7 @@ public class UpstreamContentProvider extends ContentProvider {
                 UpstreamContract.Conversation.ID + " integer PRIMARY KEY, " +
                 UpstreamContract.Conversation.UUID + " integer, " +
                 UpstreamContract.Conversation.COUNTERPARTY_UUID + " integer NOT NULL REFERENCES " + UpstreamContract.UserProfile.TABLE + " (" + UpstreamContract.UserProfile.UUID + "), " +
-                UpstreamContract.Conversation.TOPIC_UUID + " integer NOT NULL REFERENCES " + UpstreamContract.Topic.TABLE + " (" + UpstreamContract.Topic.UUID + "), " +
+                UpstreamContract.Conversation.TOPIC_UUID + " integer NOT NULL REFERENCES " + UpstreamContract.Topic.TABLE + " (" + UpstreamContract.Topic.UUID + ")" +
                 ");";
 
         public static final String SQL_CREATE_TABLE_MESSAGE =
@@ -243,7 +254,7 @@ public class UpstreamContentProvider extends ContentProvider {
                 UpstreamContract.Message.UUID + " integer, " +
                 UpstreamContract.Message.CONVERSATION_UUID + " integer NOT NULL REFERENCES " + UpstreamContract.Conversation.TABLE + " (" + UpstreamContract.Conversation.UUID + "), " +
                 UpstreamContract.Message.FROM_COUNTERPARTY + " integer NOT NULL, " +
-                UpstreamContract.Message.CONTENT + "text NOT NULL" +
+                UpstreamContract.Message.CONTENT + " text NOT NULL" +
                 ");";
 
         UpstreamDatabaseHelper(Context context) {
